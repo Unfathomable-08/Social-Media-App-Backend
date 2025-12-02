@@ -1,12 +1,12 @@
 // controllers/authController.js
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { sendVerificationCodeEmail } = require('../utils/sendEmail');
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const { sendVerificationCodeEmail } = require("../utils/sendEmail");
 
 // Helper to generate JWT
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
 // Helper to generate 6-digit code
@@ -26,10 +26,10 @@ exports.signup = async (req, res) => {
 
     if (existingUser) {
       if (existingUser.email === email && existingUser.isVerified) {
-        return res.status(400).json({ message: 'Email already registered' });
+        return res.status(400).json({ message: "Email already registered" });
       }
       if (existingUser.username === username && existingUser.isVerified) {
-        return res.status(400).json({ message: 'Username already taken' });
+        return res.status(400).json({ message: "Username already taken" });
       }
 
       // Re-use unverified account
@@ -42,15 +42,16 @@ exports.signup = async (req, res) => {
 
       // Send code (fire-and-forget)
       sendVerificationCodeEmail(email, code).catch((err) =>
-        console.error('Email sending failed:', err)
+        console.error("Email sending failed:", err)
       );
 
       const token = generateToken(existingUser._id);
-      res.setHeader('Authorization', `Bearer ${token}`);
-      res.setHeader('X-Auth-Token', token);
+      res.setHeader("Authorization", `Bearer ${token}`);
+      res.setHeader("X-Auth-Token", token);
 
       return res.status(200).json({
-        message: 'Unverified account found. A new verification code has been sent.',
+        message:
+          "Unverified account found. A new verification code has been sent.",
         user: {
           id: existingUser._id,
           username: existingUser.username,
@@ -72,15 +73,15 @@ exports.signup = async (req, res) => {
     });
 
     sendVerificationCodeEmail(email, code).catch((err) =>
-      console.error('Email sending failed:', err)
+      console.error("Email sending failed:", err)
     );
 
     const token = generateToken(user._id);
-    res.setHeader('Authorization', `Bearer ${token}`);
-    res.setHeader('X-Auth-Token', token);
+    res.setHeader("Authorization", `Bearer ${token}`);
+    res.setHeader("X-Auth-Token", token);
 
     res.status(201).json({
-      message: 'Verification code sent to your email.',
+      message: "Verification code sent to your email.",
       user: {
         id: user._id,
         username: user.username,
@@ -89,8 +90,8 @@ exports.signup = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Signup error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -101,15 +102,17 @@ exports.verifyCode = async (req, res) => {
     const userId = req.user?._id || req.body.userId; // you can pass userId or use auth middleware
 
     if (!userId && !req.user) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await User.findById(userId || req.user._id).select('+verificationCode +verificationCodeExpires');
+    const user = await User.findById(userId || req.user._id).select(
+      "+verificationCode +verificationCodeExpires"
+    );
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     if (user.isVerified) {
-      return res.status(400).json({ message: 'Email already verified' });
+      return res.status(400).json({ message: "Email already verified" });
     }
 
     if (
@@ -117,7 +120,9 @@ exports.verifyCode = async (req, res) => {
       !user.verificationCodeExpires ||
       user.verificationCodeExpires < Date.now()
     ) {
-      return res.status(400).json({ message: 'Invalid or expired verification code' });
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired verification code" });
     }
 
     user.isVerified = true;
@@ -125,10 +130,10 @@ exports.verifyCode = async (req, res) => {
     user.verificationCodeExpires = undefined;
     await user.save();
 
-    res.json({ message: 'Email verified successfully!' });
+    res.json({ message: "Email verified successfully!" });
   } catch (error) {
-    console.error('Verify code error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Verify code error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -137,8 +142,9 @@ exports.resendCode = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    if (user.isVerified) return res.status(400).json({ message: 'Email already verified' });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.isVerified)
+      return res.status(400).json({ message: "Email already verified" });
 
     const code = generateVerificationCode();
     user.verificationCode = code;
@@ -147,10 +153,10 @@ exports.resendCode = async (req, res) => {
 
     await sendVerificationCodeEmail(user.email, code);
 
-    res.json({ message: 'Verification code sent successfully' });
+    res.json({ message: "Verification code sent successfully" });
   } catch (error) {
-    console.error('Resend code error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Resend code error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -162,7 +168,7 @@ exports.login = async (req, res) => {
     // Validate input
     if (!login || !password) {
       return res.status(400).json({
-        message: 'Please provide email/username and password',
+        message: "Please provide email/username and password",
       });
     }
 
@@ -174,14 +180,14 @@ exports.login = async (req, res) => {
     // Check if user exists and password is correct
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({
-        message: 'Invalid credentials',
+        message: "Invalid credentials",
       });
     }
 
     // Block login if email is not verified
     if (!user.isVerified) {
       return res.status(403).json({
-        message: 'Please verify your email first',
+        message: "Please verify your email first",
         needVerification: true,
       });
     }
@@ -189,11 +195,11 @@ exports.login = async (req, res) => {
     const token = generateToken(user._id);
 
     // Set headers (for API clients)
-    res.setHeader('Authorization', `Bearer ${token}`);
-    res.setHeader('X-Auth-Token', token);
+    res.setHeader("Authorization", `Bearer ${token}`);
+    res.setHeader("X-Auth-Token", token);
 
     res.json({
-      message: 'Login successful',
+      message: "Login successful",
       user: {
         id: user._id,
         username: user.username,
@@ -203,8 +209,8 @@ exports.login = async (req, res) => {
       token, // optional: include in body too for convenience
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
