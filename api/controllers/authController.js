@@ -155,7 +155,6 @@ exports.resendCode = async (req, res) => {
 };
 
 // ====== Login Controller ======
-// ====== Login Controller (Email OR Username) ======
 exports.login = async (req, res) => {
   try {
     const { login, password } = req.body;
@@ -210,14 +209,14 @@ exports.login = async (req, res) => {
 };
 
 exports.getMe = async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user?._id);
   res.json({
     user: {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-      isVerified: user.isVerified,
-      createdAt: user.createdAt,
+      id: user?._id,
+      username: user?.username,
+      email: user?.email,
+      isVerified: user?.isVerified,
+      createdAt: user?.createdAt,
     },
   });
 };
