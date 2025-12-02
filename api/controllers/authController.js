@@ -1,5 +1,3 @@
-// controllers/authController.js
-const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { sendVerificationCodeEmail } = require("../utils/sendEmail");
@@ -58,6 +56,7 @@ exports.signup = async (req, res) => {
           email: existingUser.email,
           isVerified: false,
         },
+        token
       });
     }
 
@@ -206,7 +205,7 @@ exports.login = async (req, res) => {
         email: user.email,
         isVerified: user.isVerified,
       },
-      token, // optional: include in body too for convenience
+      token,
     });
   } catch (error) {
     console.error("Login error:", error);

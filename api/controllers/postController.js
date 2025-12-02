@@ -3,6 +3,7 @@ const User = require("../models/User");
 
 const createPost = async (req, res) => {
   try {
+
     const { content, image, isPublic } = req.body;
 
     const post = new Post({
