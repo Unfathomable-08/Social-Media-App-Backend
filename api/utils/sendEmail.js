@@ -1,4 +1,6 @@
+// utils/sendEmail.js  (replace the old one)
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const createTransporter = () => {
   return nodemailer.createTransport({
@@ -12,29 +14,29 @@ const createTransporter = () => {
   });
 };
 
-const sendVerificationEmail = async (email, verificationToken) => {
+const sendVerificationCodeEmail = async (email, code) => {
   const transporter = createTransporter();
-  
-  const verificationUrl = `${process.env.APP_URL}/api/auth/verify-email/${verificationToken}`;
-  
+
   const mailOptions = {
-    from: `"Social Media App" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+    from: `"Social Media App" <${process.env.SMTP_FROM || process.env.EMAIL_USER}>`,
     to: email,
-    subject: 'Verify Your Email',
+    subject: 'Your Verification Code',
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #333;">Email Verification</h1>
-        <p>Thank you for signing up! Please verify your email by clicking the button below:</p>
-        <a href="${verificationUrl}" style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0;">Verify Email</a>
-        <p>Or copy and paste this link in your browser:</p>
-        <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
-        <p>This link will expire in 24 hours.</p>
-        <p style="color: #999; font-size: 12px;">If you didn't create an account, you can safely ignore this email.</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #333;">Verify Your Email</h1>
+        <p>Thank you for signing up! Your verification code is:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #4CAF50;">
+            ${code}
+          </span>
+        </div>
+        <p>This code will expire in <strong>10 minutes</strong>.</p>
+        <p>If you didn't request this, you can safely ignore this email.</p>
       </div>
-    `
+    `,
   };
 
   await transporter.sendMail(mailOptions);
 };
 
-module.exports = { sendVerificationEmail };
+module.exports = { sendVerificationCodeEmail };
