@@ -2,9 +2,9 @@
   "name": "social-media-backend",
   "version": "1.0.0",
   "description": "Social media app backend with Node.js, Express, and MongoDB",
-  "main": "src/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node --watch src/server.js",
+    "start": "node --watch server.js",
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
