@@ -4,8 +4,7 @@
   "description": "Social media app backend with Node.js, Express, and MongoDB",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js"
+    "start": "node --watch src/server.js",
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
