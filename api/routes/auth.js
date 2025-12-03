@@ -8,6 +8,6 @@ router.post('/signup', signup);
 router.post('/login', login);
 router.post('/verify-code', protect, verifyCode);
 router.post('/resend-code', protect, resendCode);
-router.get('/me', getMe);
+router.get('/me', protect, getMe);
 
 module.exports = router;
