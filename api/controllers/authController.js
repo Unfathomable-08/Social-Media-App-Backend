@@ -20,77 +20,51 @@ exports.signup = async (req, res) => {
     // Check for existing user
     const existingUser = await User.findOne({
       $or: [{ email }, { username }],
+      isVerified: true,               // only block if already verified
     });
 
     if (existingUser) {
-      if (existingUser.email === email && existingUser.isVerified) {
-        return res.status(400).json({ message: "Email already registered" });
-      }
-      if (existingUser.username === username && existingUser.isVerified) {
-        return res.status(400).json({ message: "Username already taken" });
-      }
-
-      // Re-use unverified account
-      const code = generateVerificationCode();
-      existingUser.verificationCode = code;
-      existingUser.verificationCodeExpires = Date.now() + 10 * 60 * 1000; // 10 min
-      if (password) existingUser.password = password;
-
-      await existingUser.save();
-
-      // Send code (fire-and-forget)
-      sendVerificationCodeEmail(email, code).catch((err) =>
-        console.error("Email sending failed:", err)
-      );
-
-      const token = generateToken(existingUser._id);
-      res.setHeader("Authorization", `Bearer ${token}`);
-      res.setHeader("X-Auth-Token", token);
-
-      return res.status(200).json({
-        message:
-          "Unverified account found. A new verification code has been sent.",
-        user: {
-          id: existingUser._id,
-          username: existingUser.username,
-          email: existingUser.email,
-          isVerified: false,
-        },
-        token
+      return res.status(400).json({ 
+        message: existingUser.email === email 
+          ? "Email already registered" 
+          : "Username already taken" 
       });
     }
 
-    // New user
-    const code = generateVerificationCode();
+    // If unverified account exists -> delete it
+    await User.deleteMany({
+      $or: [{ email }, { username }],
+      isVerified: false,
+    });
 
+    // Create user and MARK AS VERIFIED immediately
     const user = await User.create({
       username,
       email,
       password,
-      verificationCode: code,
-      verificationCodeExpires: Date.now() + 10 * 60 * 1000, // 10 min
+      isVerified: true,                    // instantly verified
+      verificationCode: undefined,
+      verificationCodeExpires: undefined,
     });
-
-    sendVerificationCodeEmail(email, code).catch((err) =>
-      console.error("Email sending failed:", err)
-    );
 
     const token = generateToken(user._id);
     res.setHeader("Authorization", `Bearer ${token}`);
     res.setHeader("X-Auth-Token", token);
 
-    res.status(201).json({
-      message: "Verification code sent to your email.",
+    return res.status(201).json({
+      message: "Signup successful",
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
-        isVerified: false,
+        isVerified: true,
       },
+      token,
     });
+
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -184,12 +158,12 @@ exports.login = async (req, res) => {
     }
 
     // Block login if email is not verified
-    if (!user.isVerified) {
-      return res.status(403).json({
-        message: "Please verify your email first",
-        needVerification: true,
-      });
-    }
+    // if (!user.isVerified) {
+    //   return res.status(403).json({
+    //     message: "Please verify your email first",
+    //     needVerification: true,
+    //   });
+    // }
 
     const token = generateToken(user._id);
 
