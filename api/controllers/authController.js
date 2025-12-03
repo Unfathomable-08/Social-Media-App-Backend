@@ -189,7 +189,7 @@ exports.login = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   const user = await User.findById(req.user?._id);
-  console.log(user, req)
+  
   res.json({
     user: {
       id: user?._id,
