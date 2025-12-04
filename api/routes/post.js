@@ -4,11 +4,11 @@ const { createPost, getPosts, getPost, updatePost, deletePost, getFeed } = requi
 
 const router = express.Router();
 
-router.post('/', protect, createPost);
+router.get('/feed', protect, getFeed);
 router.get('/', protect, getPosts);
+router.post('/', protect, createPost);
 router.get('/:id', protect, getPost);
 router.put('/:id', protect, updatePost);
 router.delete('/:id', protect, deletePost);
-router.get('/feed', protect, getFeed);
 
 module.exports = router;
