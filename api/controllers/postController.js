@@ -150,7 +150,7 @@ const getFeed = async (req, res) => {
       success: true,
       message: "Feed fetched successfully"
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Feed error:", error);
     res.status(500).json({
       message: "Server error",
