@@ -189,6 +189,10 @@ exports.login = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   const user = await User.findById(req.user?._id);
+
+  const token = generateToken(user._id);
+  res.setHeader("Authorization", `Bearer ${token}`);
+  res.setHeader("X-Auth-Token", token);
   
   res.json({
     user: {
@@ -198,5 +202,6 @@ exports.getMe = async (req, res) => {
       isVerified: user?.isVerified,
       createdAt: user?.createdAt,
     },
+    token
   });
 };
