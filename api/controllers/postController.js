@@ -120,17 +120,45 @@ const deletePost = async (req, res) => {
 }
 
 const getFeed = async (req, res) => {
-   try {
-    const posts = await Post.find({ isPublic: true })
-      .sort({ createdAt: -1 })
-      .populate('user', 'username email')
-      .exec()
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const cursor = req.query.cursor; // MongoDB ObjectId as string
 
-     res.status(200).json({ posts, success: true, message: 'Feed fetched successfully' });
-   } catch (error) {
-     res.status(500).json({ message: 'Server error', error: error.message, success: false });
-   }
-}
+    let query = { isPublic: true };
+
+    if (cursor) {
+      query._id = { $lt: cursor }; // Use _id for cursor
+    }
+
+    const posts = await Post.find(query)
+      .sort({ _id: -1 })
+      .limit(limit + 1)
+      .populate("user", "username name avatar")
+      .lean(); 
+
+    const hasMore = posts.length > limit;
+    const slicedPosts = hasMore ? posts.slice(0, limit) : posts;
+
+    const nextCursor = hasMore
+      ? slicedPosts[slicedPosts.length - 1]._id.toString()
+      : null;
+
+    res.json({
+      posts: slicedPosts,
+      nextCursor,
+      hasMore,
+      success: true,
+      message: "Feed fetched successfully"
+    });
+  } catch (error: any) {
+    console.error("Feed error:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+      success: false
+    });
+  }
+};
 
 // const searchPosts = async (req, res) => {}
 
