@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/post');
 const actionRoutes = require('./routes/actions');
+const commentRoutes = require('./routes/comment');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/actions', actionRoutes);
+app.use('/api/comments', commentRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
