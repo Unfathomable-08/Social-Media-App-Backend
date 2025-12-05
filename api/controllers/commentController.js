@@ -19,6 +19,9 @@ const createComment = async (req, res) => {
 
     await comment.save();
 
+    post.commentsCount += 1;
+    await post.save();
+
     return res.status(201).json({ message: 'Comment created successfully', comment, success: true });
   } catch (error) {
     return res.status(500).json({ message: 'Server error', error: error.message, success: false });
