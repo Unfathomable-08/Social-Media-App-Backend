@@ -64,7 +64,7 @@ exports.signup = async (req, res) => {
 
   } catch (error) {
     console.error("Signup error:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -106,7 +106,7 @@ exports.verifyCode = async (req, res) => {
     res.json({ message: "Email verified successfully!" });
   } catch (error) {
     console.error("Verify code error:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -129,7 +129,7 @@ exports.resendCode = async (req, res) => {
     res.json({ message: "Verification code sent successfully" });
   } catch (error) {
     console.error("Resend code error:", error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 

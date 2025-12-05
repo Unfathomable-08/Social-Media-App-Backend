@@ -69,9 +69,9 @@ const getPost = async (req, res) => {
          return res.status(404).json({ message: 'Post not found', success: false });
       }
 
-     res.status(200).json({ post, success: true, message: 'Post fetched successfully' });
+     return res.status(200).json({ post, success: true, message: 'Post fetched successfully' });
    } catch (error) {
-     res.status(500).json({ message: 'Server error', error: error.message, success: false });
+     return res.status(500).json({ message: 'Server error', error: error.message, success: false });
    }
 }
 
@@ -94,9 +94,9 @@ const updatePost = async (req, res) => {
     post.updatedAt = Date.now();
     await post.save();
 
-    res.status(200).json({ message: 'Post updated successfully', post, success: true });
+    return res.status(200).json({ message: 'Post updated successfully', post, success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message, success: false });
+    return res.status(500).json({ message: 'Server error', error: error.message, success: false });
   }
 }
 
@@ -113,9 +113,9 @@ const deletePost = async (req, res) => {
 
      await post.deleteOne();
 
-     res.status(200).json({ message: 'Post deleted successfully', success: true });
+     return res.status(200).json({ message: 'Post deleted successfully', success: true });
    } catch (error) {
-     res.status(500).json({ message: 'Server error', error: error.message, success: false });
+     return res.status(500).json({ message: 'Server error', error: error.message, success: false });
    }
 }
 
@@ -152,7 +152,7 @@ const getFeed = async (req, res) => {
     });
   } catch (error) {
     console.error("Feed error:", error);
-    res.status(500).json({
+    return res.status(500).json({
       message: "Server error",
       error: error.message,
       success: false

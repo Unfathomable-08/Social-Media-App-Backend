@@ -12,20 +12,18 @@ const likePost = async (req, res) => {
       post.likesCount = post.likes.length;
       await post.save();
       
-      res.status(200).json({ message: 'Post unliked successfully', post, success: true });
+      return res.status(200).json({ message: 'Post unliked successfully', post, success: true });
     }
 
     post.likes.push(req.user._id);
     post.likesCount = post.likes.length;
     await post.save();
 
-    res.status(200).json({ message: 'Post liked successfully', post, success: true });
+    return res.status(200).json({ message: 'Post liked successfully', post, success: true });
     
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message, success: false });
+    return res.status(500).json({ message: 'Server error', error: error.message, success: false });
   }
 }
-
-// const commentPost = async (req, res) => {}
 
 module.exports = { likePost }
