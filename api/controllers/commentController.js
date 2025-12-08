@@ -121,4 +121,29 @@ const likeComment = async (req, res) => {
   }
 }
 
-module.exports = { createComment, getComments, updateComment, deleteComment, likeComment, getComment }
+const replyToComment = async (req, res) => {
+   try {
+     const { content } = req.body;
+     const parentComment = await Comment.findById(req.params.commentId);
+
+     if (!parentComment){
+        return res.status(404).json({ message: 'Parent comment not found', success: false });
+     }
+
+     const comment = new Comment({
+        user: req.user.id,
+        post: req.params.id,
+        content,
+        parentComment: req.params.commentId,
+        ancestors: [...parentComment.ancestors, parentComment._id]
+      })
+
+     await comment.save();
+
+     return res.status(201).json({ message: 'Reply created successfully', comment, success: true });
+   } catch (error) {
+     return res.status(500).json({ message: 'Server error', error: error.message, success: false });
+   }
+}
+
+module.exports = { createComment, getComments, updateComment, deleteComment, likeComment, getComment, replyToComment }
