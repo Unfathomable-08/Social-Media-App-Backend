@@ -1,17 +1,14 @@
 const User = require('../models/User');
 
+// get all users (name, pfp, username) that has similar username to the one provided
 const getUserByUsername = async (req, res) => {
   try {
     const { username } = req.params;
-    const user = await User.findOne({ username }).select('-password');
-
-    if (!user){
-      return res.status(404).json({ message: 'User not found', success: false });
-    }
-
-    return res.status(200).json({ user, success: true });
-  } catch (error) {
-    return res.status(500).json({ message: 'Server error', error: error.message, success: false });
+    const users = await User.find({ username: { $regex: username, $options: 'i' } }).select('name username avatar');
+    res.status(200).json({ users, success: true });
+  }
+  catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message, success: false });
   }
 }
 

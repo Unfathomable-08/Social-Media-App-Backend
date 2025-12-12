@@ -9,6 +9,15 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: [3, 'Username must be at least 3 characters']
   },
+  name: {
+    type: String,
+    required: [true, 'Name is required'],
+    trim: true,
+    minlength: [3, 'Name must be at least 3 characters']
+  },
+  avatar: {
+    type: String
+  },
   email: {
     type: String,
     required: [true, 'Email is required'],
