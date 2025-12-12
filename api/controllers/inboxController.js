@@ -53,7 +53,7 @@ const storeChatMetadata = async (req, res) => {
 
     const chat = new ChatMetadata({
       users: [req.user.id, ...users],
-      slug: `${req.user.id}-${users.join('-')}`
+      slug: `${req.user.id}_${users.join('_')}`
     })
 
     await chat.save();
