@@ -5,7 +5,7 @@ const { getUsersByUsername, getChatsMetadata, storeChatMetadata, deleteChatMetad
 const router = express.Router();
 
 router.get('/username/:username', protect, getUsersByUsername);
-router.get('/id/:username', protect, getUserById);
+router.get('/id/:id', protect, getUserById);
 router.get('/chats', protect, getChatsMetadata);
 router.post('/chats', protect, storeChatMetadata);
 router.delete('/chats/:slug', protect, deleteChatMetadata);
