@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const ChatMetadata = require('../models/ChatMetadata');
 
-// get all users (name, pfp, username) that has similar username to the one provided
 const getUsersByUsername = async (req, res) => {
   try {
     const { username } = req.params;
@@ -35,7 +34,22 @@ const getUsersByUsername = async (req, res) => {
   }
 };
 
-// get stored metadata of chats to show on inbox screen
+const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id).select('name username avatar');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found', success: false });
+    }
+
+    res.status(200).json({ user, success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message, success: false });
+  }
+};
+
 const getChatsMetadata = async (req, res) => {
   try {    
     const chats = await ChatMetadata.find({ users: req.user.id }).populate('users', 'name username avatar');
@@ -46,7 +60,6 @@ const getChatsMetadata = async (req, res) => {
   }
 }
 
-// stor metadata of a new chat
 const storeChatMetadata = async (req, res) => {
   try {
     const { users } = req.body;
@@ -64,7 +77,6 @@ const storeChatMetadata = async (req, res) => {
   }
 }
 
-// delete metadata of a chat
 const deleteChatMetadata = async (req, res) => {
   try {
     const { slug } = req.params;
@@ -83,4 +95,4 @@ const deleteChatMetadata = async (req, res) => {
   }
 }
 
-module.exports = { getUsersByUsername, getChatsMetadata, storeChatMetadata, deleteChatMetadata }
+module.exports = { getUsersByUsername, getChatsMetadata, storeChatMetadata, deleteChatMetadata, getUserById }
