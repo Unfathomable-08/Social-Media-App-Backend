@@ -1,10 +1,10 @@
 const User = require('../models/User');
 
 // get all users (name, pfp, username) that has similar username to the one provided
-const getUserByUsername = async (req, res) => {
+const getUsersByUsername = async (req, res) => {
   try {
     const { username } = req.params;
-    const users = await User.find({ username: { $regex: username, $options: 'i' } }).select('name username avatar');
+    const users = await User.find({ username: { $regex: username, $options: 'i' } }).select('name username avatar').limit(20);
     res.status(200).json({ users, success: true });
   }
   catch (error) {
@@ -12,4 +12,4 @@ const getUserByUsername = async (req, res) => {
   }
 }
 
-module.exports = { getUserByUsername }
+module.exports = { getUsersByUsername }
