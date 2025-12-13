@@ -64,6 +64,16 @@ const storeChatMetadata = async (req, res) => {
   try {
     const { users } = req.body;
 
+    const allUsers = [req.user.id, ...users];
+
+    const existingChat = await ChatMetadata.findOne({
+      users: { $all: allUsers, $size: allUsers.length }
+    });
+
+    if (existingChat) {
+      return res.status(200).json({ message: 'Chat already exists', chat: existingChat, success: true });
+    }
+
     const chat = new ChatMetadata({
       users: [req.user.id, ...users],
       slug: `${req.user.id}_${users.join('_')}`
