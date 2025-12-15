@@ -34,3 +34,5 @@ const updateAccountSettings = async (req, res) => {
      res.status(500).json({ message: 'Server error', error: error.message, success: false });
    }
 }
+
+module.exports = { updateAccountSettings }
